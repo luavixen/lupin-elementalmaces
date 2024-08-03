@@ -18,8 +18,11 @@ import net.minecraft.world.item.Items;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Method;
-import java.util.function.Consumer;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.util.Arrays;
+import java.util.List;
 
 public final class ElementalMacesMod implements ModInitializer {
 
@@ -27,23 +30,27 @@ public final class ElementalMacesMod implements ModInitializer {
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create("elementalmaces", Registries.ITEM);
 
-    public static final RegistrySupplier<AbstractElementalMaceItem> WITHERING_MACE = ITEMS.register("withering_mace", WitheringMaceItem::new);
     public static final RegistrySupplier<AbstractElementalMaceItem> RESONATING_MACE = ITEMS.register("resonating_mace", ResonatingMaceItem::new);
+    public static final RegistrySupplier<AbstractElementalMaceItem> WITHERING_MACE = ITEMS.register("withering_mace", WitheringMaceItem::new);
     public static final RegistrySupplier<AbstractElementalMaceItem> ENDER_MACE = ITEMS.register("ender_mace", EnderMaceItem::new);
     public static final RegistrySupplier<AbstractElementalMaceItem> SMOULDERING_MACE = ITEMS.register("smouldering_mace", SmoulderingMaceItem::new);
 
-    public static final RegistrySupplier<Item> WITHERING_ROD = ITEMS.register("withering_rod", () -> new Item(new Item.Properties()));
     public static final RegistrySupplier<Item> RESONATING_ROD = ITEMS.register("resonating_rod", () -> new Item(new Item.Properties()));
+    public static final RegistrySupplier<Item> WITHERING_ROD = ITEMS.register("withering_rod", () -> new Item(new Item.Properties()));
 
-    public static void forEachMaceItem(Consumer<AbstractElementalMaceItem> consumer) {
-        consumer.accept(WITHERING_MACE.get());
-        consumer.accept(RESONATING_MACE.get());
-        consumer.accept(ENDER_MACE.get());
-        consumer.accept(SMOULDERING_MACE.get());
+    public static List<AbstractElementalMaceItem> getMaceItems() {
+        return Arrays.asList(
+            RESONATING_MACE.get(),
+            WITHERING_MACE.get(),
+            ENDER_MACE.get(),
+            SMOULDERING_MACE.get()
+        );
     }
-    public static void forEachRodItem(Consumer<Item> consumer) {
-        consumer.accept(WITHERING_ROD.get());
-        consumer.accept(RESONATING_ROD.get());
+    public static List<Item> getRodItems() {
+        return Arrays.asList(
+            RESONATING_ROD.get(),
+            WITHERING_ROD.get()
+        );
     }
 
     private static void tryRegisterMace3DModels() {
@@ -51,31 +58,21 @@ public final class ElementalMacesMod implements ModInitializer {
             Platform.getEnvironment() == Env.CLIENT &&
             Platform.isModLoaded("mace3d")
         ) {
-            LOGGER.info("(Mace3D support) Registering external 3D mace models");
+            LOGGER.info("3D Mace support: registering external 3D mace models");
             try {
-                Class<?> mace3D = Class.forName("dev.foxgirl.mace3d.Mace3D");
-                Method registerMethod = mace3D.getMethod("registerExternalMaceModel", Item.class, ResourceLocation.class, ResourceLocation.class);
-                registerMethod.invoke(null, WITHERING_MACE.get(),
-                    ResourceLocation.fromNamespaceAndPath("elementalmaces", "withering_mace"),
-                    ResourceLocation.fromNamespaceAndPath("elementalmaces", "withering_mace_in_hand")
+                MethodHandle registerModelMethod = MethodHandles.lookup().findStatic(
+                    Class.forName("dev.foxgirl.mace3d.Mace3D"), "registerExternalMaceModel",
+                    MethodType.methodType(void.class, Item.class, ResourceLocation.class, ResourceLocation.class)
                 );
-                registerMethod.invoke(null, RESONATING_MACE.get(),
-                    ResourceLocation.fromNamespaceAndPath("elementalmaces", "resonating_mace"),
-                    ResourceLocation.fromNamespaceAndPath("elementalmaces", "resonating_mace_in_hand")
-                );
-                registerMethod.invoke(null, ENDER_MACE.get(),
-                    ResourceLocation.fromNamespaceAndPath("elementalmaces", "ender_mace"),
-                    ResourceLocation.fromNamespaceAndPath("elementalmaces", "ender_mace_in_hand")
-                );
-                registerMethod.invoke(null, SMOULDERING_MACE.get(),
-                    ResourceLocation.fromNamespaceAndPath("elementalmaces", "smouldering_mace"),
-                    ResourceLocation.fromNamespaceAndPath("elementalmaces", "smouldering_mace_in_hand")
-                );
-            } catch (ReflectiveOperationException cause) {
-                LOGGER.error("(Mace3D support) Failed to register external 3D mace models", cause);
+                for (var item : getMaceItems()) {
+                    var id = ITEMS.getRegistrar().getId(item);
+                    registerModelMethod.invoke(item, id, id.withSuffix("_in_hand"));
+                }
+            } catch (Throwable cause) {
+                LOGGER.error("3D Mace support: failed to register external 3D mace models", cause);
             }
         } else {
-            LOGGER.info("(Mace3D support) Mace3D is not loaded, skipping external 3D mace models");
+            LOGGER.info("3D Mace support: 'mace3d' is not loaded, skipping external 3D mace models");
         }
     }
 
@@ -89,10 +86,10 @@ public final class ElementalMacesMod implements ModInitializer {
 
         ItemGroupEvents
             .modifyEntriesEvent(CreativeModeTabs.COMBAT)
-            .register(content -> forEachMaceItem(item -> content.addAfter(Items.MACE, item)));
+            .register(content -> getMaceItems().forEach(item -> content.addAfter(Items.MACE, item)));
         ItemGroupEvents
             .modifyEntriesEvent(CreativeModeTabs.INGREDIENTS)
-            .register(content -> forEachRodItem(item -> content.addAfter(Items.BREEZE_ROD, item)));
+            .register(content -> getRodItems().forEach(item -> content.addAfter(Items.BREEZE_ROD, item)));
 
         EntityEvent.LIVING_HURT.register((entity, source, amount) -> {
             if (source.is(DamageTypes.IN_FIRE) && entity.isHolding(SMOULDERING_MACE.get())) {
