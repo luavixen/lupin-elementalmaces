@@ -1,0 +1,6 @@
+{
+    "parent": "mace3d:item/mace_in_hand",
+    "textures": {
+        "0": "elementalmaces:item/ender_mace"
+    }
+}

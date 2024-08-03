@@ -1,0 +1,49 @@
+plugins {
+    id 'fabric-loom' version '1.6.9'
+}
+
+archivesBaseName = project.mod_name
+
+group = project.mod_group
+version = project.mod_version
+
+repositories {
+    maven {
+        name = 'Architectury Maven'
+        url = 'https://maven.architectury.dev/'
+    }
+    maven {
+        name = 'ParchmentMC Maven'
+        url = 'https://maven.parchmentmc.org/'
+    }
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-1.21:2024.07.07@zip")
+    }
+
+    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    modImplementation "dev.architectury:architectury-fabric:${project.architectury_api_version}"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+compileJava {
+    options.release = 21
+    options.encoding = 'UTF-8'
+}
+
+processResources {
+    filesMatching(['fabric.mod.json', 'META-INF/mods.toml', 'META-INF/*.mods.toml']) {
+        expand 'version': project.mod_version, 'mcversion': project.minecraft_version_min
+    }
+}

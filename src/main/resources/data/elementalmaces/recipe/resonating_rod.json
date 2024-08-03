@@ -1,0 +1,24 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "category": "misc",
+    "pattern": [
+        "ECE",
+        "E|E",
+        "EEE"
+    ],
+    "key": {
+        "|": {
+            "item": "minecraft:breeze_rod"
+        },
+        "E": {
+            "item": "minecraft:echo_shard"
+        },
+        "C": {
+            "item": "minecraft:sculk_catalyst"
+        }
+    },
+    "result": {
+        "id": "elementalmaces:resonating_rod",
+        "count": 1
+    }
+}
