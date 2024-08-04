@@ -1,0 +1,30 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+
+license = "UNLICENSED"
+
+[[mods]]
+modId = "elementalmaces"
+version = "${version}"
+
+displayName = "Elemental Maces"
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/elemental-maces"
+
+authors = "lupiiin_, luavixen <lua@foxgirl.dev> (https://foxgirl.dev/)"
+description = "Adds unique new Mace items, craftable with a Heavy Core and appropriate rod."
+
+logoFile = "elementalmaces_icon.png"
+
+[[dependencies.elementalmaces]]
+modId = "forge"
+mandatory = true
+versionRange = "[51.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.elementalmaces]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[${mcversion},)"
+ordering = "NONE"
+side = "BOTH"
