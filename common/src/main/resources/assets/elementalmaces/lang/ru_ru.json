@@ -1,0 +1,20 @@
+{
+  "item.elementalmaces.withering_mace": "Иссушающая булава",
+  "item.elementalmaces.withering_mace.lore.line1": "Высасывает жизнь из ваших врагов,",
+  "item.elementalmaces.withering_mace.lore.line2": "медленно превращая их в пыль после удара",
+
+  "item.elementalmaces.resonating_mace": "Резонирующая булава",
+  "item.elementalmaces.resonating_mace.lore.line1": "Вибрирует с интенсивной звуковой силой,",
+  "item.elementalmaces.resonating_mace.lore.line2": "вызывая ударную волну при ударе",
+
+  "item.elementalmaces.ender_mace": "Эндер-булава",
+  "item.elementalmaces.ender_mace.lore.line1": "Древняя технология Энда создаёт левитацию,",
+  "item.elementalmaces.ender_mace.lore.line2": "подвешивая ваших врагов в воздухе при ударе",
+
+  "item.elementalmaces.smouldering_mace": "Тлеющая булава",
+  "item.elementalmaces.smouldering_mace.lore.line1": "Пылает силой Незера,",
+  "item.elementalmaces.smouldering_mace.lore.line2": "воспламеняя всё вокруг при ударе",
+
+  "item.elementalmaces.withering_rod": "Иссушающий вихревой стержень",
+  "item.elementalmaces.resonating_rod": "Резонирующий вихревой стержень"
+}
